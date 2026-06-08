@@ -111,7 +111,7 @@ export function LeadDetailPanel({ lead, updateAction }: { lead: LeadRecord; upda
         <Card>
           <CardHeader>
             <CardTitle>Outreach drafts</CardTitle>
-            <CardDescription>Template-based drafts generated from this lead's fields.</CardDescription>
+            <CardDescription>Template-based drafts generated from this lead&apos;s fields.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {drafts.map((draft) => (

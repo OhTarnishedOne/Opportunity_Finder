@@ -35,7 +35,7 @@ export function OutreachGenerator({ leads }: { leads: LeadRecord[] }) {
         <CardHeader>
           <CardTitle>Outreach generator</CardTitle>
           <CardDescription>
-            Template-based copy using lead context, LCS Engine proof-of-work, and Rico's founder/operator positioning.
+            Template-based copy using lead context, LCS Engine proof-of-work, and Rico&apos;s founder/operator positioning.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
