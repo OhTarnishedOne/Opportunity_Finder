@@ -86,9 +86,9 @@ function Chart({ title, data }: { title: string; data: { name: string; value: nu
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent className="h-80">
+      <CardContent className="h-80 min-w-0">
         {mounted ? (
-          <ResponsiveContainer height="100%" width="100%">
+          <ResponsiveContainer height="100%" minHeight={1} minWidth={1} width="100%">
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" fontSize={11} tickLine={false} />

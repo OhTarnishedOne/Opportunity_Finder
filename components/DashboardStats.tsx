@@ -75,9 +75,9 @@ function ChartCard({ title, data, money = false }: { title: string; data: { name
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent className="h-72">
+      <CardContent className="h-72 min-w-0">
         {mounted ? (
-          <ResponsiveContainer height="100%" width="100%">
+          <ResponsiveContainer height="100%" minHeight={1} minWidth={1} width="100%">
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" fontSize={11} tickLine={false} />
@@ -107,9 +107,9 @@ function PieCard({ title, data }: { title: string; data: { name: string; value: 
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent className="h-72">
+      <CardContent className="h-72 min-w-0">
         {mounted ? (
-          <ResponsiveContainer height="100%" width="100%">
+          <ResponsiveContainer height="100%" minHeight={1} minWidth={1} width="100%">
             <PieChart>
               <Pie data={data} dataKey="value" innerRadius={50} nameKey="name" outerRadius={90} paddingAngle={3}>
                 {data.map((entry, index) => (
