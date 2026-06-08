@@ -66,7 +66,8 @@ function ChartCard({ title, data, money = false }: { title: string; data: { name
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const frame = window.requestAnimationFrame(() => setMounted(true));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   return (
@@ -97,7 +98,8 @@ function PieCard({ title, data }: { title: string; data: { name: string; value: 
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const frame = window.requestAnimationFrame(() => setMounted(true));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   return (
