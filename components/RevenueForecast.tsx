@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { buildRevenueForecast } from "@/lib/revenue";
 import type { LeadRecord } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export function RevenueForecast({ leads }: { leads: LeadRecord[] }) {
   const forecast = buildRevenueForecast(leads);
@@ -73,21 +74,31 @@ function ForecastCard({ label, value }: { label: string; value: number }) {
 }
 
 function Chart({ title, data }: { title: string; data: { name: string; value: number }[] }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="h-80">
-        <ResponsiveContainer height="100%" width="100%">
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="name" fontSize={11} tickLine={false} />
-            <YAxis fontSize={11} tickFormatter={(value) => `$${Number(value) / 1000}K`} />
-            <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-            <Bar dataKey="value" fill="#0f172a" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        {mounted ? (
+          <ResponsiveContainer height="100%" width="100%">
+            <BarChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="name" fontSize={11} tickLine={false} />
+              <YAxis fontSize={11} tickFormatter={(value) => `$${Number(value) / 1000}K`} />
+              <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+              <Bar dataKey="value" fill="#0f172a" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-full rounded-xl bg-slate-100" />
+        )}
       </CardContent>
     </Card>
   );

@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { buildRevenueForecast } from "@/lib/revenue";
 import type { LeadRecord } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 const COLORS = ["#0f172a", "#0284c7", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#14b8a6"];
 
@@ -62,46 +63,70 @@ function StatCard({ label, value, description }: { label: string; value: string;
 }
 
 function ChartCard({ title, data, money = false }: { title: string; data: { name: string; value: number }[]; money?: boolean }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="h-72">
-        <ResponsiveContainer height="100%" width="100%">
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="name" fontSize={11} tickLine={false} />
-            <YAxis fontSize={11} tickFormatter={(value) => (money ? `$${Number(value) / 1000}K` : String(value))} />
-            <Tooltip formatter={(value) => (money ? formatCurrency(Number(value)) : value)} />
-            <Bar dataKey="value" fill="#0284c7" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        {mounted ? (
+          <ResponsiveContainer height="100%" width="100%">
+            <BarChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="name" fontSize={11} tickLine={false} />
+              <YAxis fontSize={11} tickFormatter={(value) => (money ? `$${Number(value) / 1000}K` : String(value))} />
+              <Tooltip formatter={(value) => (money ? formatCurrency(Number(value)) : value)} />
+              <Bar dataKey="value" fill="#0284c7" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <ChartPlaceholder />
+        )}
       </CardContent>
     </Card>
   );
 }
 
 function PieCard({ title, data }: { title: string; data: { name: string; value: number }[] }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="h-72">
-        <ResponsiveContainer height="100%" width="100%">
-          <PieChart>
-            <Pie data={data} dataKey="value" innerRadius={50} nameKey="name" outerRadius={90} paddingAngle={3}>
-              {data.map((entry, index) => (
-                <Cell fill={COLORS[index % COLORS.length]} key={entry.name} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
+        {mounted ? (
+          <ResponsiveContainer height="100%" width="100%">
+            <PieChart>
+              <Pie data={data} dataKey="value" innerRadius={50} nameKey="name" outerRadius={90} paddingAngle={3}>
+                {data.map((entry, index) => (
+                  <Cell fill={COLORS[index % COLORS.length]} key={entry.name} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        ) : (
+          <ChartPlaceholder />
+        )}
       </CardContent>
     </Card>
   );
+}
+
+function ChartPlaceholder() {
+  return <div className="h-full rounded-xl bg-slate-100" />;
 }
 
 function toChartData(leads: LeadRecord[], key: keyof LeadRecord) {
