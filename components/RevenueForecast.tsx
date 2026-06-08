@@ -1,11 +1,11 @@
 "use client";
 
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
+import { MeasuredChart } from "@/components/MeasuredChart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildRevenueForecast } from "@/lib/revenue";
 import type { LeadRecord } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
-import { useEffect, useState } from "react";
 
 export function RevenueForecast({ leads }: { leads: LeadRecord[] }) {
   const forecast = buildRevenueForecast(leads);
@@ -74,32 +74,23 @@ function ForecastCard({ label, value }: { label: string; value: number }) {
 }
 
 function Chart({ title, data }: { title: string; data: { name: string; value: number }[] }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(() => setMounted(true));
-    return () => window.cancelAnimationFrame(frame);
-  }, []);
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="h-80 min-w-0">
-        {mounted ? (
-          <ResponsiveContainer height="100%" minHeight={1} minWidth={1} width="100%">
-            <BarChart data={data}>
+        <MeasuredChart>
+          {({ width, height }) => (
+            <BarChart data={data} height={height} width={width}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" fontSize={11} tickLine={false} />
               <YAxis fontSize={11} tickFormatter={(value) => `$${Number(value) / 1000}K`} />
               <Tooltip formatter={(value) => formatCurrency(Number(value))} />
               <Bar dataKey="value" fill="#0f172a" radius={[8, 8, 0, 0]} />
             </BarChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="h-full rounded-xl bg-slate-100" />
-        )}
+          )}
+        </MeasuredChart>
       </CardContent>
     </Card>
   );
