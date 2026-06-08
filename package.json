@@ -4,7 +4,7 @@
   "description": "Local-first sales operating system for finding and prioritizing high-value consulting opportunities.",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
