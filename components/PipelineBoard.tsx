@@ -1,11 +1,11 @@
 import Link from "next/link";
-import type { Lead } from "@prisma/client";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { StageBadge } from "@/components/StageBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { STAGES } from "@/lib/constants";
+import type { LeadRecord } from "@/lib/types";
 
-export function PipelineBoard({ leads }: { leads: Lead[] }) {
+export function PipelineBoard({ leads }: { leads: LeadRecord[] }) {
   const activeStages = STAGES.filter((stage) => leads.some((lead) => lead.stage === stage));
 
   return (

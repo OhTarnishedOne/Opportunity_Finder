@@ -1,11 +1,11 @@
 import Link from "next/link";
-import type { Lead } from "@prisma/client";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { StageBadge } from "@/components/StageBadge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import type { LeadRecord } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
-export function FollowUpList({ leads }: { leads: Lead[] }) {
+export function FollowUpList({ leads }: { leads: LeadRecord[] }) {
   const now = new Date();
   const oneWeek = new Date(now);
   oneWeek.setDate(now.getDate() + 7);
@@ -29,7 +29,7 @@ export function FollowUpList({ leads }: { leads: Lead[] }) {
   );
 }
 
-function FollowUpCard({ title, description, leads }: { title: string; description: string; leads: Lead[] }) {
+function FollowUpCard({ title, description, leads }: { title: string; description: string; leads: LeadRecord[] }) {
   return (
     <Card>
       <CardHeader>

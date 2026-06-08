@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Lead } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { OUTREACH_TYPES } from "@/lib/constants";
 import { generateOutreach, type OutreachType } from "@/lib/outreach";
+import type { LeadRecord } from "@/lib/types";
 
-export function OutreachGenerator({ leads }: { leads: Lead[] }) {
+export function OutreachGenerator({ leads }: { leads: LeadRecord[] }) {
   const [leadId, setLeadId] = useState(leads[0]?.id ?? "");
   const [type, setType] = useState<OutreachType>("Cold Email");
   const selectedLead = leads.find((lead) => lead.id === leadId) ?? leads[0];

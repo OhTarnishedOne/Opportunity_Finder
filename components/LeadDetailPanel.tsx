@@ -1,4 +1,3 @@
-import type { Lead } from "@prisma/client";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { LeadScoreCard } from "@/components/LeadScoreCard";
 import { PriorityBadge } from "@/components/PriorityBadge";
@@ -11,11 +10,12 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { STAGES } from "@/lib/constants";
 import { generateAllOutreach } from "@/lib/outreach";
+import type { LeadRecord } from "@/lib/types";
 import { formatDate, toDateInputValue } from "@/lib/utils";
 
 type Action = (formData: FormData) => Promise<void>;
 
-export function LeadDetailPanel({ lead, updateAction }: { lead: Lead; updateAction: Action }) {
+export function LeadDetailPanel({ lead, updateAction }: { lead: LeadRecord; updateAction: Action }) {
   const drafts = generateAllOutreach(lead);
 
   return (

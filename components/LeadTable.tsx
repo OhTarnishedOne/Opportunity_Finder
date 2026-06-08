@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import type { Lead } from "@prisma/client";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { EmptyState } from "@/components/EmptyState";
 import { PriorityBadge } from "@/components/PriorityBadge";
@@ -13,9 +12,10 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CATEGORIES, PRIORITIES, STAGES } from "@/lib/constants";
+import type { LeadRecord } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
-export function LeadTable({ leads, compact = false }: { leads: Lead[]; compact?: boolean }) {
+export function LeadTable({ leads, compact = false }: { leads: LeadRecord[]; compact?: boolean }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [stage, setStage] = useState("All");

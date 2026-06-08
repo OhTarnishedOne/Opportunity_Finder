@@ -1,14 +1,14 @@
 "use client";
 
-import type { Lead } from "@prisma/client";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildRevenueForecast } from "@/lib/revenue";
+import type { LeadRecord } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 
 const COLORS = ["#0f172a", "#0284c7", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#14b8a6"];
 
-export function DashboardStats({ leads }: { leads: Lead[] }) {
+export function DashboardStats({ leads }: { leads: LeadRecord[] }) {
   const forecast = buildRevenueForecast(leads);
   const callsBooked = leads.filter((lead) => lead.stage === "Call Booked").length;
   const proposalsSent = leads.filter((lead) => lead.stage === "Proposal Sent").length;
@@ -104,7 +104,7 @@ function PieCard({ title, data }: { title: string; data: { name: string; value: 
   );
 }
 
-function toChartData(leads: Lead[], key: keyof Lead) {
+function toChartData(leads: LeadRecord[], key: keyof LeadRecord) {
   const counts = leads.reduce<Record<string, number>>((acc, lead) => {
     const name = String(lead[key] ?? "Unknown");
     acc[name] = (acc[name] ?? 0) + 1;

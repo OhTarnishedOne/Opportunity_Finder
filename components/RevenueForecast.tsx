@@ -1,12 +1,12 @@
 "use client";
 
-import type { Lead } from "@prisma/client";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildRevenueForecast } from "@/lib/revenue";
+import type { LeadRecord } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 
-export function RevenueForecast({ leads }: { leads: Lead[] }) {
+export function RevenueForecast({ leads }: { leads: LeadRecord[] }) {
   const forecast = buildRevenueForecast(leads);
   const byCategory = Object.entries(forecast.categoryTotals).map(([name, value]) => ({ name, value }));
   const byStage = Object.entries(forecast.stageTotals).map(([name, value]) => ({ name, value }));
