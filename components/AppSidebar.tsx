@@ -9,6 +9,7 @@ import {
   Home,
   Mail,
   PlusCircle,
+  Search,
   Settings,
   Table2,
 } from "lucide-react";
@@ -19,6 +20,7 @@ const items = [
   { href: "/", label: "Dashboard", icon: Home },
   { href: "/leads", label: "Leads", icon: Table2 },
   { href: "/leads/new", label: "Add Lead", icon: PlusCircle },
+  { href: "/sourcing", label: "Sourcing", icon: Search },
   { href: "/outreach", label: "Outreach", icon: Mail },
   { href: "/forecast", label: "Forecast", icon: DollarSign },
   { href: "/followups", label: "Follow-ups", icon: CalendarClock },

@@ -41,6 +41,10 @@ model Lead {
   monthlyRevenuePotential         String?
   objectionRisk                   String?
   confidenceLevel                 String?
+  sourceUrl                       String?
+  sourceType                      String?
+  sourceLastScrapedAt             DateTime?
+  sourceConfidence                Int      @default(1)
   priorityLevel                   String   @default("Worth Testing")
   createdAt                       DateTime @default(now())
   updatedAt                       DateTime @updatedAt
@@ -49,4 +53,5 @@ model Lead {
   @@index([stage])
   @@index([priorityLevel])
   @@index([followUpDate])
+  @@index([sourceUrl])
 }

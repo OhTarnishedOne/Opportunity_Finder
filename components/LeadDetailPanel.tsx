@@ -40,6 +40,9 @@ export function LeadDetailPanel({ lead, updateAction }: { lead: LeadRecord; upda
             <Info label="Location" value={lead.location} />
             <Info label="Email" value={lead.contactEmail} />
             <Info label="Warm intro" value={lead.warmIntroSource} />
+            <Info label="Source URL" value={lead.sourceUrl} />
+            <Info label="Source type" value={lead.sourceType} />
+            <Info label="Source confidence" value={lead.sourceUrl ? `${lead.sourceConfidence}/5` : undefined} />
             <Info label="Revenue potential" value={lead.monthlyRevenuePotential} />
             <Info label="Last contacted" value={formatDate(lead.lastContactedDate)} />
             <Info label="Follow-up" value={formatDate(lead.followUpDate)} />

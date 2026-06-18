@@ -58,4 +58,18 @@ export const stageUpdateSchema = z.object({
   notes: optionalText,
 });
 
+export const sourcingSchema = z.object({
+  urls: z
+    .string()
+    .trim()
+    .min(1, "Paste at least one public URL")
+    .transform((value) =>
+      value
+        .split(/\n|,/)
+        .map((url) => url.trim())
+        .filter(Boolean)
+        .slice(0, 10),
+    ),
+});
+
 export type LeadFormValues = z.infer<typeof leadFormSchema>;

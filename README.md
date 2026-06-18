@@ -6,7 +6,7 @@ It answers one daily question:
 
 > Who should Rico contact today, why are they a fit, what should he pitch, and what should he say?
 
-The app is built as a modern SaaS-style MVP with Next.js, TypeScript, Tailwind CSS, shadcn-style UI components, Prisma ORM, SQLite, Recharts, and Zod. It does not include authentication, scraping, browser automation, paid APIs, or external AI calls.
+The app is built as a modern SaaS-style MVP with Next.js, TypeScript, Tailwind CSS, shadcn-style UI components, Prisma ORM, SQLite, Recharts, and Zod. It does not include authentication, browser automation, paid APIs, or external AI calls. It includes a conservative local scraper for public pages that you explicitly paste into the sourcing page.
 
 ## Why this exists
 
@@ -144,6 +144,51 @@ Default assumptions:
 4. Save the lead.
 5. Review the generated fit score, priority, suggested offer, and outreach drafts.
 
+## Public web sourcing automation
+
+Go to `/sourcing` to paste public URLs and create draft leads from web pages.
+
+Good sources:
+
+- university program pages
+- business school centers
+- executive education pages
+- accelerator cohort pages
+- venture studio portfolio pages
+- credit union financial wellness pages
+- fintech, wealthtech, edtech, and AI company pages
+- official staff, leadership, or program pages
+
+Safety rules:
+
+- Paste specific public URLs only; the app does not run broad crawling.
+- Do not paste LinkedIn, logged-in directories, private communities, or social platforms.
+- The scraper checks basic `robots.txt` disallow rules before fetching a submitted URL.
+- Do not guess private emails. If a public email is not visible, use a contact form or warm intro.
+- Treat every scraped lead as a draft that needs manual review before outreach.
+
+The scraper tries to extract:
+
+- organization name
+- likely category
+- website
+- possible public contact name/title
+- public email if visible on the page
+- public LinkedIn/company link if linked from the page
+- source URL
+- source confidence
+- notes with scraped evidence
+- deterministic score, priority, offer, and revenue potential
+
+Recommended workflow:
+
+1. Research 5-10 public source pages.
+2. Paste them into `/sourcing`.
+3. Review created draft leads from the result links.
+4. Correct contact names, titles, categories, and notes.
+5. Find warm intro paths.
+6. Generate outreach only after manual verification.
+
 ## CSV export
 
 Use the `Export CSV` button on the lead table or visit:
@@ -152,13 +197,13 @@ Use the `Export CSV` button on the lead table or visit:
 /api/leads/export
 ```
 
-The export uses snake_case headers matching `data/sample_leads.csv`.
+The export uses snake_case headers and includes source metadata fields for scraped leads.
 
 CSV import is intentionally not included in this MVP. TODO: add a validated CSV import flow that previews parsed rows, highlights errors, and applies scoring before writing to SQLite.
 
 ## Daily workflow
 
-1. Add or import new leads.
+1. Add, import, or source new leads.
 2. Score them.
 3. Review top 10 opportunities.
 4. Generate outreach for 3-5 leads.
@@ -184,6 +229,7 @@ CSV import is intentionally not included in this MVP. TODO: add a validated CSV 
 - `/leads` - Lead list with search, filters, sorting, badges, and CSV export
 - `/leads/new` - Add lead form
 - `/leads/[id]` - Lead detail, score breakdown, suggested offer, outreach drafts, notes, and stage updates
+- `/sourcing` - Public URL scraper that creates draft leads for review
 - `/outreach` - Outreach generator
 - `/forecast` - Revenue forecast
 - `/followups` - Follow-up tracker
@@ -198,5 +244,5 @@ CSV import is intentionally not included in this MVP. TODO: add a validated CSV 
 - PostgreSQL migration
 - Activity timeline
 - Relationship graph and intro path tracking
-- Optional scraping or enrichment after explicit approval
+- More advanced enrichment after explicit approval
 - Optional external AI generation after explicit approval and API key configuration

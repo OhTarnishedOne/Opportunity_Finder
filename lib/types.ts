@@ -33,6 +33,10 @@ export type LeadRecord = {
   monthlyRevenuePotential: string | null;
   objectionRisk: string | null;
   confidenceLevel: string | null;
+  sourceUrl: string | null;
+  sourceType: string | null;
+  sourceLastScrapedAt: Date | null;
+  sourceConfidence: number;
   priorityLevel: string;
   createdAt: Date;
   updatedAt: Date;
