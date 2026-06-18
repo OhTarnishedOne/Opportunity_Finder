@@ -1,10 +1,11 @@
 import * as cheerio from "cheerio";
-import { CATEGORIES, SCORE_FIELDS } from "@/lib/constants";
+import { CATEGORIES, SCORE_FIELDS, SOURCING_MODES } from "@/lib/constants";
 
 const USER_AGENT = "OpportunityFinderOS/1.0 (+local-first lead research; respects public pages)";
 const MAX_HTML_BYTES = 1_500_000;
 
 type ScoreKey = (typeof SCORE_FIELDS)[number]["key"];
+export type SourcingMode = (typeof SOURCING_MODES)[number];
 
 export type ScrapedLeadDraft = Record<ScoreKey, number> & {
   companyName: string;
@@ -44,9 +45,10 @@ type ScrapeResult =
 const TITLE_PATTERNS =
   /(director|program director|executive director|head of|vp|vice president|chief|ceo|founder|co-founder|partner|principal|managing partner|dean|professor|chair|innovation|entrepreneurship|financial wellness|community impact|product|strategy)/i;
 
-export async function scrapeLeadFromUrl(rawUrl: string): Promise<ScrapeResult> {
+export async function scrapeLeadFromUrl(rawUrl: string, options: { sourcingMode?: SourcingMode } = {}): Promise<ScrapeResult> {
   const warnings: string[] = [];
   const url = normalizeUrl(rawUrl);
+  const sourcingMode = options.sourcingMode ?? "General";
 
   if (!url) {
     return { ok: false, url: rawUrl, error: "Invalid URL", warnings };
@@ -121,7 +123,7 @@ export async function scrapeLeadFromUrl(rawUrl: string): Promise<ScrapeResult> {
   const lines = textLines(pageText);
 
   const companyName = inferCompanyName({ title, siteName, hostname: url.hostname });
-  const category = inferCategory(`${title} ${description} ${pageText} ${url.hostname}`);
+  const category = inferCategory(`${title} ${description} ${pageText} ${url.hostname}`, sourcingMode);
   const email = extractEmail(pageText);
   const linkedinUrl = extractLinkedInUrl($);
   const contact = extractContact(lines);
@@ -133,6 +135,7 @@ export async function scrapeLeadFromUrl(rawUrl: string): Promise<ScrapeResult> {
 
   const notes = [
     `Source: ${url.toString()}`,
+    `Sourcing mode: ${sourcingMode}`,
     `Scraped evidence: ${description || firstUsefulLine(lines) || title}`,
     contact.name || contact.title ? `Possible decision-maker: ${[contact.name, contact.title].filter(Boolean).join(" - ")}` : "",
     email ? `Public email found on page: ${email}` : "No public email found; do not guess private emails.",
@@ -155,17 +158,17 @@ export async function scrapeLeadFromUrl(rawUrl: string): Promise<ScrapeResult> {
       contactEmail: email,
       linkedinUrl,
       notes,
-      personalizedAngle: personalizedAngleFor(category, companyName),
-      estimatedBudget: estimatedBudgetFor(category),
+      personalizedAngle: personalizedAngleFor(category, companyName, sourcingMode),
+      estimatedBudget: estimatedBudgetFor(category, sourcingMode),
       stage: "Found",
       nextAction: "Review scraped lead, verify decision-maker, and identify warm intro path",
       sourceUrl: url.toString(),
-      sourceType: "Public web page",
+      sourceType: `${sourcingMode} public web page`,
       sourceConfidence,
       remoteFriendly: true,
       objectionRisk: "Scraped lead requires manual verification before outreach.",
       confidenceLevel: sourceConfidence >= 4 ? "Medium-high after manual review" : "Low until reviewed",
-      ...scoresFor(category, sourceConfidence),
+      ...scoresFor(category, sourceConfidence, sourcingMode),
     },
   };
 }
@@ -262,8 +265,21 @@ function inferCompanyName({ title, siteName, hostname }: { title: string; siteNa
   return hostname.replace(/^www\./, "").split(".")[0].replaceAll("-", " ");
 }
 
-function inferCategory(text: string) {
+function inferCategory(text: string, sourcingMode: SourcingMode) {
   const normalized = text.toLowerCase();
+
+  if (sourcingMode === "Family Offices") return "Family Office";
+  if (sourcingMode === "Startups") {
+    if (normalized.includes("fintech") || normalized.includes("wealth")) return "Fintech Startup";
+    if (normalized.includes("venture studio")) return "Venture Studio";
+    if (normalized.includes("accelerator")) return "Accelerator";
+    return "AI Startup";
+  }
+  if (sourcingMode === "Universities / Institutions") return "HBCU / Workforce Program";
+  if (sourcingMode === "Credit Unions / Wealth") {
+    if (normalized.includes("credit union")) return "Credit Union";
+    return "RIA / Wealth Manager";
+  }
 
   if (normalized.includes("family office")) return "Family Office";
   if (normalized.includes("credit union")) return "Credit Union";
@@ -354,7 +370,11 @@ function calculateSourceConfidence({
   return Math.min(5, score);
 }
 
-function personalizedAngleFor(category: string, companyName: string) {
+function personalizedAngleFor(category: string, companyName: string, sourcingMode: SourcingMode) {
+  if (sourcingMode === "Family Offices" || category === "Family Office") {
+    return `${companyName} may be a fit for a smaller or mid-size family office conversation around practical AI workflows, investment education, decision quality, portfolio learning, and next-gen financial literacy.`;
+  }
+
   if (category === "HBCU / Workforce Program" || category === "Financial Literacy Organization" || category === "Edtech Company") {
     return `${companyName} may be a fit for a decision-intelligence workshop or institutional pilot that teaches prediction, calibration, and applied AI for financial and business decision-making.`;
   }
@@ -366,16 +386,36 @@ function personalizedAngleFor(category: string, companyName: string) {
   return `${companyName} may be a fit for turning AI/product ambiguity into shipped workflows, prototypes, or customer-facing decision-intelligence features.`;
 }
 
-function estimatedBudgetFor(category: string) {
+function estimatedBudgetFor(category: string, sourcingMode: SourcingMode) {
+  if (sourcingMode === "Family Offices" || category === "Family Office") {
+    return "$5K-$10K/month retainer or focused AI workflow audit";
+  }
+
   if (category === "HBCU / Workforce Program" || category === "Credit Union") return "$15K-$25K institutional pilot/license";
-  if (category === "Family Office" || category === "Fintech Startup" || category === "Wealthtech Platform") return "$10K-$20K/month";
+  if (category === "Fintech Startup" || category === "Wealthtech Platform") return "$10K-$20K/month";
   return "$5K-$10K/month";
 }
 
-function scoresFor(category: string, sourceConfidence: number): Record<ScoreKey, number> {
+function scoresFor(category: string, sourceConfidence: number, sourcingMode: SourcingMode): Record<ScoreKey, number> {
   const institutional = ["HBCU / Workforce Program", "Financial Literacy Organization", "Edtech Company", "Credit Union"].includes(category);
   const wealth = ["Family Office", "RIA / Wealth Manager", "Wealthtech Platform", "Investment Platform"].includes(category);
   const startup = ["Fintech Startup", "AI Startup", "Venture Studio", "Accelerator"].includes(category);
+
+  if (sourcingMode === "Family Offices" || category === "Family Office") {
+    return {
+      abilityToPay: 4,
+      fitWithMyBackground: 5,
+      needForAiProductHelp: 4,
+      relevanceToLcs: 5,
+      relevanceToDecisionIntelligence: 5,
+      familyOfficeOrWealthFit: 5,
+      institutionalEducationFit: 2,
+      accessibilityOfDecisionMaker: Math.min(4, Math.max(2, sourceConfidence)),
+      warmIntroStrength: 1,
+      urgency: 3,
+      remoteOrFractionalFit: 4,
+    };
+  }
 
   return {
     abilityToPay: institutional || wealth ? 4 : 3,

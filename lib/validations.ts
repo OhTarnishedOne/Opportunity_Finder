@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CATEGORIES, REVENUE_POTENTIALS, STAGES } from "@/lib/constants";
+import { CATEGORIES, REVENUE_POTENTIALS, SOURCING_MODES, STAGES } from "@/lib/constants";
 
 const optionalText = z
   .string()
@@ -59,6 +59,7 @@ export const stageUpdateSchema = z.object({
 });
 
 export const sourcingSchema = z.object({
+  sourcingMode: z.enum(SOURCING_MODES).default("General"),
   urls: z
     .string()
     .trim()

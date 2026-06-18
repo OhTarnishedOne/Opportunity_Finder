@@ -86,7 +86,7 @@ export async function scrapeLeadsAction(
   };
 
   for (const url of parsed.data.urls) {
-    const result = await scrapeLeadFromUrl(url);
+    const result = await scrapeLeadFromUrl(url, { sourcingMode: parsed.data.sourcingMode });
 
     if (!result.ok) {
       state.errors.push({
@@ -120,6 +120,6 @@ export async function scrapeLeadsAction(
 
   return {
     ...state,
-    message: `Created ${state.created.length} lead${state.created.length === 1 ? "" : "s"} from ${parsed.data.urls.length} URL${parsed.data.urls.length === 1 ? "" : "s"}.`,
+    message: `Created ${state.created.length} ${parsed.data.sourcingMode.toLowerCase()} lead${state.created.length === 1 ? "" : "s"} from ${parsed.data.urls.length} URL${parsed.data.urls.length === 1 ? "" : "s"}.`,
   };
 }

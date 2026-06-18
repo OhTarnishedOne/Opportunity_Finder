@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { SOURCING_MODES } from "@/lib/constants";
 
 const initialState: SourcingActionState = {
   created: [],
@@ -28,6 +30,18 @@ export function SourcingScraper() {
         </CardHeader>
         <CardContent>
           <form action={action} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="sourcingMode">Sourcing mode</Label>
+              <Select defaultValue="General" id="sourcingMode" name="sourcingMode">
+                {SOURCING_MODES.map((mode) => (
+                  <option key={mode}>{mode}</option>
+                ))}
+              </Select>
+              <p className="text-xs leading-5 text-slate-500">
+                Choose Family Offices when sourcing smaller or mid-size offices so draft leads are scored and positioned
+                correctly.
+              </p>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="urls">Public URLs</Label>
               <Textarea
@@ -61,6 +75,42 @@ export function SourcingScraper() {
               Every scraped lead is a draft. Review the source, correct names/titles, find a warm path, then send outreach
               manually.
             </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Family office sourcing playbook</CardTitle>
+            <CardDescription>Smaller and mid-size family offices are often discreet, so look for public signals and warm paths.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm leading-6 text-slate-600">
+            <div>
+              <div className="font-semibold text-slate-950">Best public pages to paste</div>
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                <li>family office websites with team or investment philosophy pages</li>
+                <li>multi-family office and boutique wealth advisory pages</li>
+                <li>next-gen wealth education, philanthropy, or family governance pages</li>
+                <li>conference speaker bios mentioning family office principals, CIOs, COOs, or innovation leads</li>
+                <li>RIA pages serving ultra-high-net-worth families or family offices</li>
+              </ul>
+            </div>
+            <div>
+              <div className="font-semibold text-slate-950">Search queries to collect URLs</div>
+              <pre className="mt-2 whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-xs leading-5 text-slate-50">{`"single family office" "next generation" education
+"family office" "investment education" principal
+"multi-family office" "innovation" "wealth"
+"family office" "AI" investment education
+"family office" "financial literacy" next gen
+"family governance" "next generation" "investment education"
+"family office services" "portfolio learning"`}</pre>
+            </div>
+            <div>
+              <div className="font-semibold text-slate-950">Pitch angle</div>
+              <p className="mt-2">
+                Lead with practical AI workflows, next-gen investment education, decision quality, portfolio learning, and
+                family financial literacy. Avoid sounding like a generic software vendor.
+              </p>
+            </div>
           </CardContent>
         </Card>
 

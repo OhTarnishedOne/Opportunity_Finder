@@ -76,6 +76,14 @@ export const OUTREACH_TYPES = [
   "Reactivation Note",
 ] as const;
 
+export const SOURCING_MODES = [
+  "General",
+  "Family Offices",
+  "Startups",
+  "Universities / Institutions",
+  "Credit Unions / Wealth",
+] as const;
+
 export const SCORE_FIELDS = [
   { key: "abilityToPay", label: "Ability to pay" },
   { key: "fitWithMyBackground", label: "Fit with Rico's background" },

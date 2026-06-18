@@ -148,6 +148,16 @@ Default assumptions:
 
 Go to `/sourcing` to paste public URLs and create draft leads from web pages.
 
+Choose a sourcing mode before scraping:
+
+- General
+- Family Offices
+- Startups
+- Universities / Institutions
+- Credit Unions / Wealth
+
+Use **Family Offices** when collecting smaller or mid-size family office pages. This biases the draft lead toward family office category, scoring, budget assumptions, and outreach positioning.
+
 Good sources:
 
 - university program pages
@@ -158,6 +168,9 @@ Good sources:
 - credit union financial wellness pages
 - fintech, wealthtech, edtech, and AI company pages
 - official staff, leadership, or program pages
+- smaller and mid-size family office websites
+- multi-family office and boutique wealth advisory pages
+- next-gen wealth education, philanthropy, or family governance pages
 
 Safety rules:
 
@@ -188,6 +201,20 @@ Recommended workflow:
 4. Correct contact names, titles, categories, and notes.
 5. Find warm intro paths.
 6. Generate outreach only after manual verification.
+
+Family office search prompts:
+
+```text
+"single family office" "next generation" education
+"family office" "investment education" principal
+"multi-family office" "innovation" "wealth"
+"family office" "AI" investment education
+"family office" "financial literacy" next gen
+"family governance" "next generation" "investment education"
+"family office services" "portfolio learning"
+```
+
+For smaller and mid-size family offices, prioritize warm paths and credibility signals. Many offices are discreet and may not publish direct emails. Use official contact forms, conference bios, public team pages, or trusted introductions instead of guessing contact details.
 
 ## CSV export
 
