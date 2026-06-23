@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3,
+  BriefcaseBusiness,
   CalendarClock,
   DollarSign,
   Home,
@@ -20,6 +21,7 @@ import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/", label: "Dashboard", icon: Home },
+  { href: "/job-search", label: "Job Search", icon: BriefcaseBusiness },
   { href: "/leads", label: "Leads", icon: Table2 },
   { href: "/leads/new", label: "Add Lead", icon: PlusCircle },
   { href: "/sourcing", label: "Sourcing", icon: Search },

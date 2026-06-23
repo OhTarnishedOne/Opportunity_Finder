@@ -28,6 +28,8 @@ Opportunity Finder OS turns that proof into a practical daily workflow for:
 - fintech product development
 - institutional pilots for credit unions, HBCUs, workforce programs, and wealth platforms
 
+It also includes a separate Job Search Operator mode for senior IC and leadership roles at AI and fintech companies. That mode is for application strategy, target role definition, resume/LinkedIn positioning, and outreach assets; it does not replace the lead pipeline.
+
 ## Tech stack
 
 - Next.js App Router
@@ -150,6 +152,33 @@ Default assumptions:
 4. Save the lead.
 5. Review the generated fit score, priority, suggested offer, and outreach drafts.
 
+## Job Search Operator
+
+Go to `/job-search` for the reusable system prompt and checklist for senior IC and leadership job search work.
+
+Use this when evaluating:
+
+- GTM / Solutions roles for AI or fintech products
+- Product owner or senior IC roles for AI features
+- Innovation or decision-intelligence roles at funds, family offices, fintech firms, or AI firms
+- Founder/operator roles at AI, fintech, wealthtech, edtech, or decision-support startups
+
+The operator prompt reinforces:
+
+- founder/product/AI positioning
+- real markets and trading-systems exposure
+- near-term income needs
+- de-prioritizing pure institutional quant researcher branding
+- structured outputs: goal recap, targets, recommended roles/companies, application assets, and next 7 days plan
+
+Before using the prompt, gather:
+
+- latest resume or LinkedIn profile text
+- income timing and target compensation range
+- location flexibility and target titles
+- target companies, job descriptions, or warm connections
+- roles, industries, and work setups to avoid
+
 ## Public web sourcing automation
 
 Go to `/sourcing` to paste public URLs and create draft leads from web pages.
@@ -269,6 +298,7 @@ Scores should be 1-5. Missing score fields default conservatively.
 ## Routes
 
 - `/` - Dashboard
+- `/job-search` - Reusable Job Search Operator prompt and execution checklist
 - `/leads` - Lead list with search, filters, sorting, badges, and CSV export
 - `/leads/new` - Add lead form
 - `/leads/[id]` - Lead detail, score breakdown, suggested offer, outreach drafts, notes, and stage updates
