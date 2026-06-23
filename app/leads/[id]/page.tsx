@@ -3,6 +3,8 @@ import { updateLeadStageAction } from "@/app/actions";
 import { LeadDetailPanel } from "@/components/LeadDetailPanel";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const lead = await prisma.lead.findUnique({ where: { id } });

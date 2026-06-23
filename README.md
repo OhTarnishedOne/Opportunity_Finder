@@ -8,6 +8,12 @@ It answers one daily question:
 
 The app is built as a modern SaaS-style MVP with Next.js, TypeScript, Tailwind CSS, shadcn-style UI components, Prisma ORM, SQLite, Recharts, and Zod. It does not include authentication, browser automation, paid APIs, or external AI calls. It includes a conservative local scraper for public pages that you explicitly paste into the sourcing page.
 
+## Framework integration note
+
+The prompt framework was merged into the existing Next.js platform rather than replacing it with Streamlit. The resulting app keeps the framework's local-first MVP workflow: manual lead entry, scoring, deterministic outreach, follow-up tracking, revenue forecasting, CSV import/export, SQLite storage, and no required external APIs.
+
+The `/sourcing` page is optional. You can ignore it and run the app as a fully manual local MVP.
+
 ## Why this exists
 
 Rico is positioned as a founder/operator and AI product builder, not a pure software engineer. The central proof-of-work is LCS Engine: a shipped decision intelligence platform for investing education that teaches users to think under uncertainty by making predictions about real economic events and measuring how well their confidence matches outcomes.
@@ -218,7 +224,7 @@ For smaller and mid-size family offices, prioritize warm paths and credibility s
 
 ## CSV export
 
-Use the `Export CSV` button on the lead table or visit:
+Use the `Export CSV` button on the lead table, visit `/import-export`, or download directly from:
 
 ```text
 /api/leads/export
@@ -226,7 +232,17 @@ Use the `Export CSV` button on the lead table or visit:
 
 The export uses snake_case headers and includes source metadata fields for scraped leads.
 
-CSV import is intentionally not included in this MVP. TODO: add a validated CSV import flow that previews parsed rows, highlights errors, and applies scoring before writing to SQLite.
+## CSV import
+
+Go to `/import-export` to upload or paste a CSV. The importer accepts snake_case headers, creates leads in SQLite, recalculates fit score, assigns priority, recommends an offer, and returns row-level errors for rows that cannot be imported.
+
+Minimum useful CSV headers:
+
+```text
+company_name,category,website,location,contact_name,contact_title,contact_email,notes,urgency,ability_to_pay,fit_with_my_background,need_for_ai_product_help,relevance_to_lcs,accessibility_of_decision_maker,warm_intro_strength,remote_or_fractional_fit,stage,next_action
+```
+
+Scores should be 1-5. Missing score fields default conservatively.
 
 ## Daily workflow
 
@@ -257,6 +273,8 @@ CSV import is intentionally not included in this MVP. TODO: add a validated CSV 
 - `/leads/new` - Add lead form
 - `/leads/[id]` - Lead detail, score breakdown, suggested offer, outreach drafts, notes, and stage updates
 - `/sourcing` - Public URL scraper that creates draft leads for review
+- `/import-export` - CSV import and export
+- `/scoring` - Scoring model and priority category reference
 - `/outreach` - Outreach generator
 - `/forecast` - Revenue forecast
 - `/followups` - Follow-up tracker
@@ -264,7 +282,6 @@ CSV import is intentionally not included in this MVP. TODO: add a validated CSV 
 
 ## Future enhancements
 
-- CSV import with validation preview
 - Editable scoring and revenue assumptions in the UI
 - Authentication
 - Vercel deployment profile

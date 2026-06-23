@@ -99,17 +99,17 @@ export const SCORE_FIELDS = [
 ] as const;
 
 export const SCORE_WEIGHTS: Record<(typeof SCORE_FIELDS)[number]["key"], number> = {
-  abilityToPay: 18,
-  fitWithMyBackground: 14,
-  needForAiProductHelp: 14,
-  relevanceToLcs: 12,
-  relevanceToDecisionIntelligence: 8,
-  familyOfficeOrWealthFit: 6,
-  institutionalEducationFit: 6,
-  accessibilityOfDecisionMaker: 8,
-  warmIntroStrength: 6,
-  urgency: 5,
-  remoteOrFractionalFit: 3,
+  abilityToPay: 20,
+  fitWithMyBackground: 15,
+  needForAiProductHelp: 15,
+  relevanceToLcs: 15,
+  relevanceToDecisionIntelligence: 0,
+  familyOfficeOrWealthFit: 0,
+  institutionalEducationFit: 0,
+  accessibilityOfDecisionMaker: 10,
+  warmIntroStrength: 10,
+  urgency: 10,
+  remoteOrFractionalFit: 5,
 };
 
 export const REVENUE_ASSUMPTIONS = {

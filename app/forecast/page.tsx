@@ -1,6 +1,8 @@
 import { RevenueForecast } from "@/components/RevenueForecast";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function ForecastPage() {
   const leads = await prisma.lead.findMany({ orderBy: [{ fitScore: "desc" }] });
 

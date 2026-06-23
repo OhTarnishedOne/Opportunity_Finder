@@ -1,6 +1,8 @@
 import { LeadTable } from "@/components/LeadTable";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function LeadsPage() {
   const leads = await prisma.lead.findMany({ orderBy: [{ fitScore: "desc" }, { createdAt: "desc" }] });
 

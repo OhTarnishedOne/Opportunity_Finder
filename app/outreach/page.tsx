@@ -1,6 +1,8 @@
 import { OutreachGenerator } from "@/components/OutreachGenerator";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function OutreachPage() {
   const leads = await prisma.lead.findMany({ orderBy: [{ fitScore: "desc" }, { updatedAt: "desc" }] });
 

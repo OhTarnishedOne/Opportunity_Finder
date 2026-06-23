@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { csvRecordToLead, parseCsvText } from "@/lib/csv";
 import { scrapeLeadFromUrl } from "@/lib/scraper";
 import { enrichLeadScores } from "@/lib/scoring";
 import { leadFormSchema, sourcingSchema, stageUpdateSchema } from "@/lib/validations";
@@ -66,6 +67,18 @@ export type SourcingActionState = {
   }>;
 };
 
+export type CsvImportActionState = {
+  message?: string;
+  imported: Array<{
+    id: string;
+    companyName: string;
+  }>;
+  errors: Array<{
+    row: number;
+    error: string;
+  }>;
+};
+
 export async function scrapeLeadsAction(
   _previousState: SourcingActionState,
   formData: FormData,
@@ -121,5 +134,69 @@ export async function scrapeLeadsAction(
   return {
     ...state,
     message: `Created ${state.created.length} ${parsed.data.sourcingMode.toLowerCase()} lead${state.created.length === 1 ? "" : "s"} from ${parsed.data.urls.length} URL${parsed.data.urls.length === 1 ? "" : "s"}.`,
+  };
+}
+
+export async function importCsvAction(
+  _previousState: CsvImportActionState,
+  formData: FormData,
+): Promise<CsvImportActionState> {
+  const file = formData.get("csvFile");
+  const pasted = String(formData.get("csvText") || "").trim();
+  let csvText = pasted;
+
+  if (file instanceof File && file.size > 0) {
+    csvText = await file.text();
+  }
+
+  if (!csvText.trim()) {
+    return {
+      message: "Upload a CSV file or paste CSV text.",
+      imported: [],
+      errors: [],
+    };
+  }
+
+  const records = parseCsvText(csvText);
+  const state: CsvImportActionState = {
+    imported: [],
+    errors: [],
+  };
+
+  for (const [index, record] of records.entries()) {
+    try {
+      const leadInput = csvRecordToLead(record);
+
+      if (!leadInput.companyName || leadInput.companyName === "Untitled imported lead") {
+        throw new Error("Missing company_name");
+      }
+
+      const scoring = enrichLeadScores(leadInput);
+      const lead = await prisma.lead.create({
+        data: {
+          ...leadInput,
+          ...scoring,
+        },
+      });
+
+      state.imported.push({
+        id: lead.id,
+        companyName: lead.companyName,
+      });
+    } catch (error) {
+      state.errors.push({
+        row: index + 2,
+        error: error instanceof Error ? error.message : "Could not import row",
+      });
+    }
+  }
+
+  revalidatePath("/");
+  revalidatePath("/leads");
+  revalidatePath("/import-export");
+
+  return {
+    ...state,
+    message: `Imported ${state.imported.length} lead${state.imported.length === 1 ? "" : "s"} from ${records.length} row${records.length === 1 ? "" : "s"}.`,
   };
 }

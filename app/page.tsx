@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const leads = await prisma.lead.findMany({ orderBy: [{ fitScore: "desc" }, { updatedAt: "desc" }] });
   const topLeads = leads.slice(0, 10);

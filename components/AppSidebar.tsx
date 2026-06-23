@@ -7,10 +7,12 @@ import {
   CalendarClock,
   DollarSign,
   Home,
+  Import,
   Mail,
   PlusCircle,
   Search,
   Settings,
+  SlidersHorizontal,
   Table2,
 } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
@@ -21,6 +23,8 @@ const items = [
   { href: "/leads", label: "Leads", icon: Table2 },
   { href: "/leads/new", label: "Add Lead", icon: PlusCircle },
   { href: "/sourcing", label: "Sourcing", icon: Search },
+  { href: "/import-export", label: "Import / Export", icon: Import },
+  { href: "/scoring", label: "Scoring", icon: SlidersHorizontal },
   { href: "/outreach", label: "Outreach", icon: Mail },
   { href: "/forecast", label: "Forecast", icon: DollarSign },
   { href: "/followups", label: "Follow-ups", icon: CalendarClock },
