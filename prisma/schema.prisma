@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Lead {
+  id                              String   @id @default(cuid())
+  companyName                     String
+  category                        String
+  website                         String?
+  location                        String?
+  contactName                     String?
+  contactTitle                    String?
+  contactEmail                    String?
+  linkedinUrl                     String?
+  warmIntroSource                 String?
+  notes                           String?
+  estimatedBudget                 String?
+  urgency                         Int      @default(3)
+  remoteFriendly                  Boolean  @default(true)
+  abilityToPay                    Int      @default(3)
+  fitWithMyBackground             Int      @default(3)
+  needForAiProductHelp            Int      @default(3)
+  relevanceToLcs                  Int      @default(3)
+  relevanceToDecisionIntelligence Int      @default(3)
+  familyOfficeOrWealthFit         Int      @default(3)
+  institutionalEducationFit       Int      @default(3)
+  accessibilityOfDecisionMaker    Int      @default(3)
+  warmIntroStrength               Int      @default(1)
+  remoteOrFractionalFit           Int      @default(3)
+  fitScore                        Int      @default(0)
+  stage                           String   @default("Found")
+  nextAction                      String?
+  lastContactedDate               DateTime?
+  followUpDate                    DateTime?
+  suggestedOffer                  String?
+  personalizedAngle               String?
+  monthlyRevenuePotential         String?
+  objectionRisk                   String?
+  confidenceLevel                 String?
+  sourceUrl                       String?
+  sourceType                      String?
+  sourceLastScrapedAt             DateTime?
+  sourceConfidence                Int      @default(1)
+  canonicalUrl                    String?
+  atsProvider                     String   @default("UNKNOWN")
+  atsExternalId                   String?
+  atsBoardToken                   String?
+  verificationStatus              String   @default("UNVERIFIED")
+  lastVerifiedAt                  DateTime?
+  lastCheckedAt                   DateTime?
+  staleDetectedAt                 DateTime?
+  staleReason                     String?
+  checkFailCount                  Int      @default(0)
+  priorityLevel                   String   @default("Worth Testing")
+  createdAt                       DateTime @default(now())
+  updatedAt                       DateTime @updatedAt
+
+  @@index([category])
+  @@index([stage])
+  @@index([priorityLevel])
+  @@index([followUpDate])
+  @@index([sourceUrl])
+  @@index([verificationStatus, lastCheckedAt])
+}
