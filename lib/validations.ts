@@ -13,6 +13,7 @@ export const leadFormSchema = z.object({
   companyName: z.string().trim().min(1, "Company name is required"),
   category: z.enum(CATEGORIES),
   website: optionalText,
+  canonicalUrl: optionalText,
   location: optionalText,
   contactName: optionalText,
   contactTitle: optionalText,

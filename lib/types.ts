@@ -37,6 +37,16 @@ export type LeadRecord = {
   sourceType: string | null;
   sourceLastScrapedAt: Date | null;
   sourceConfidence: number;
+  canonicalUrl: string | null;
+  atsProvider: string;
+  atsExternalId: string | null;
+  atsBoardToken: string | null;
+  verificationStatus: string;
+  lastVerifiedAt: Date | null;
+  lastCheckedAt: Date | null;
+  staleDetectedAt: Date | null;
+  staleReason: string | null;
+  checkFailCount: number;
   priorityLevel: string;
   createdAt: Date;
   updatedAt: Date;

@@ -45,6 +45,16 @@ model Lead {
   sourceType                      String?
   sourceLastScrapedAt             DateTime?
   sourceConfidence                Int      @default(1)
+  canonicalUrl                    String?
+  atsProvider                     String   @default("UNKNOWN")
+  atsExternalId                   String?
+  atsBoardToken                   String?
+  verificationStatus              String   @default("UNVERIFIED")
+  lastVerifiedAt                  DateTime?
+  lastCheckedAt                   DateTime?
+  staleDetectedAt                 DateTime?
+  staleReason                     String?
+  checkFailCount                  Int      @default(0)
   priorityLevel                   String   @default("Worth Testing")
   createdAt                       DateTime @default(now())
   updatedAt                       DateTime @updatedAt
@@ -54,4 +64,5 @@ model Lead {
   @@index([priorityLevel])
   @@index([followUpDate])
   @@index([sourceUrl])
+  @@index([verificationStatus, lastCheckedAt])
 }

@@ -4,7 +4,10 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function OutreachPage() {
-  const leads = await prisma.lead.findMany({ orderBy: [{ fitScore: "desc" }, { updatedAt: "desc" }] });
+  const leads = await prisma.lead.findMany({
+    where: { verificationStatus: { not: "STALE" } },
+    orderBy: [{ fitScore: "desc" }, { updatedAt: "desc" }],
+  });
 
   return (
     <div className="space-y-6">

@@ -11,6 +11,7 @@ const variants = {
   "Proposal Sent": "success",
   Won: "success",
   Lost: "danger",
+  Park: "secondary",
   Nurture: "secondary",
 } as const;
 

@@ -5,20 +5,34 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { csvRecordToLead, parseCsvText } from "@/lib/csv";
 import { scrapeLeadFromUrl } from "@/lib/scraper";
-import { enrichLeadScores } from "@/lib/scoring";
+import { applyAvailabilityCap, enrichLeadScores } from "@/lib/scoring";
 import { leadFormSchema, sourcingSchema, stageUpdateSchema } from "@/lib/validations";
+import { canonicalize } from "@/lib/verification/canonicalize";
 
 function dateOrNull(value?: string) {
   return value ? new Date(`${value}T00:00:00`) : null;
 }
 
+async function canonicalDataFor(url?: string | null) {
+  const canonicalized = await canonicalize(url);
+  return {
+    canonicalUrl: canonicalized.canonicalUrl,
+    sourceUrl: canonicalized.sourceUrl,
+    atsProvider: canonicalized.atsProvider,
+    atsExternalId: canonicalized.atsExternalId,
+    atsBoardToken: canonicalized.atsBoardToken,
+  };
+}
+
 export async function createLeadAction(formData: FormData) {
   const parsed = leadFormSchema.parse(Object.fromEntries(formData.entries()));
-  const scoring = enrichLeadScores(parsed);
+  const canonical = await canonicalDataFor(parsed.canonicalUrl || parsed.website);
+  const scoring = applyAvailabilityCap(enrichLeadScores(parsed), canonical.atsProvider);
 
   const lead = await prisma.lead.create({
     data: {
       ...parsed,
+      ...canonical,
       lastContactedDate: dateOrNull(parsed.lastContactedDate),
       followUpDate: dateOrNull(parsed.followUpDate),
       monthlyRevenuePotential: parsed.monthlyRevenuePotential || scoring.monthlyRevenuePotential,
@@ -110,11 +124,13 @@ export async function scrapeLeadsAction(
       continue;
     }
 
-    const scoring = enrichLeadScores(result.draft);
+    const canonical = await canonicalDataFor(result.draft.sourceUrl || result.draft.website);
+    const scoring = applyAvailabilityCap(enrichLeadScores(result.draft), canonical.atsProvider);
     const lead = await prisma.lead.create({
       data: {
         ...result.draft,
         ...scoring,
+        ...canonical,
         sourceLastScrapedAt: new Date(),
       },
     });
@@ -171,11 +187,13 @@ export async function importCsvAction(
         throw new Error("Missing company_name");
       }
 
-      const scoring = enrichLeadScores(leadInput);
+      const canonical = await canonicalDataFor(leadInput.canonicalUrl || leadInput.sourceUrl || leadInput.website);
+      const scoring = applyAvailabilityCap(enrichLeadScores(leadInput), canonical.atsProvider);
       const lead = await prisma.lead.create({
         data: {
           ...leadInput,
           ...scoring,
+          ...canonical,
         },
       });
 

@@ -27,6 +27,7 @@ export function LeadForm({ action }: { action: Action }) {
             </Select>
           </div>
           <Field label="Website" name="website" placeholder="https://example.com" />
+          <Field label="Canonical ATS / job URL" name="canonicalUrl" placeholder="https://job-boards.greenhouse.io/company/jobs/123" />
           <Field label="Location" name="location" placeholder="Remote, NYC, Atlanta..." />
           <Field label="Contact name" name="contactName" />
           <Field label="Contact title" name="contactTitle" />

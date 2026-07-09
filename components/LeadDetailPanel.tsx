@@ -2,6 +2,8 @@ import { CategoryBadge } from "@/components/CategoryBadge";
 import { LeadScoreCard } from "@/components/LeadScoreCard";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { StageBadge } from "@/components/StageBadge";
+import { VerificationStatusBadge } from "@/components/VerificationStatusBadge";
+import { VerifyOpportunityButton } from "@/components/VerifyOpportunityButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -35,8 +37,15 @@ export function LeadDetailPanel({ lead, updateAction }: { lead: LeadRecord; upda
             <div className="flex flex-wrap gap-2">
               <PriorityBadge priority={lead.priorityLevel} />
               <StageBadge stage={lead.stage} />
+              <VerificationStatusBadge lastCheckedAt={lead.lastCheckedAt} staleReason={lead.staleReason} status={lead.verificationStatus} />
             </div>
             <Info label="Website" value={lead.website} />
+            <Info label="Canonical ATS / job URL" value={lead.canonicalUrl} />
+            <Info label="ATS provider" value={lead.atsProvider} />
+            <Info label="ATS board / org" value={lead.atsBoardToken} />
+            <Info label="ATS external id" value={lead.atsExternalId} />
+            <Info label="Last checked" value={formatDate(lead.lastCheckedAt)} />
+            <Info label="Stale reason" value={lead.staleReason} />
             <Info label="Location" value={lead.location} />
             <Info label="Email" value={lead.contactEmail} />
             <Info label="Warm intro" value={lead.warmIntroSource} />
@@ -46,6 +55,16 @@ export function LeadDetailPanel({ lead, updateAction }: { lead: LeadRecord; upda
             <Info label="Revenue potential" value={lead.monthlyRevenuePotential} />
             <Info label="Last contacted" value={formatDate(lead.lastContactedDate)} />
             <Info label="Follow-up" value={formatDate(lead.followUpDate)} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Listing verification</CardTitle>
+            <CardDescription>Checks the canonical ATS URL when available. Stale listings are auto-parked, not deleted.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <VerifyOpportunityButton leadId={lead.id} status={lead.verificationStatus} />
           </CardContent>
         </Card>
 

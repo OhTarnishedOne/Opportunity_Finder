@@ -273,6 +273,63 @@ company_name,category,website,location,contact_name,contact_title,contact_email,
 
 Scores should be 1-5. Missing score fields default conservatively.
 
+## Listing verification
+
+Opportunity Finder includes an active-posting verification layer for job and role opportunities so stale aggregator listings do not silently stay in the active pipeline.
+
+Principles:
+
+- The direct ATS URL is the source of truth.
+- Aggregator URLs are treated as source leads, not evidence.
+- Verification is advisory and never destructive.
+- Stale listings are auto-parked, hidden from active views by default, removed from follow-up reminders, and kept as history.
+- Failed checks become `ERROR` for retry/manual review, not `STALE`.
+
+Supported provider detection:
+
+- Greenhouse
+- Lever
+- Ashby
+- Workday
+- Other / unknown HTML pages
+
+When a lead is created, imported, or sourced, the app attempts to canonicalize its URL:
+
+- `canonicalUrl` stores the direct ATS/job URL when found.
+- `sourceUrl` stores the original URL when it came from an aggregator or sourcing page.
+- `atsProvider`, `atsBoardToken`, and `atsExternalId` are populated when recognizable.
+- If no ATS link is found, the lead is still saved as `UNKNOWN`, but its fit score is capped below Strong Lead until availability is verified manually.
+
+Verification states:
+
+- `UNVERIFIED` - never checked
+- `ACTIVE` - confirmed live
+- `STALE` - confirmed closed or removed
+- `ERROR` - check failed or needs manual review
+
+Use the `Verify now` button on a lead detail page for a single check. Use `/verification` to review unverified or failed checks.
+
+Batch verification endpoint:
+
+```text
+POST /api/verification/run
+Authorization: Bearer $CRON_SECRET
+```
+
+The batch job checks due `ACTIVE`, `UNVERIFIED`, and retryable `ERROR` rows, excludes `STALE`, caps each run, and applies retry backoff for errors.
+
+Vercel cron is configured in `vercel.json`:
+
+```json
+{
+  "crons": [
+    { "path": "/api/verification/run", "schedule": "0 11 * * *" }
+  ]
+}
+```
+
+For production, set `CRON_SECRET` before enabling the cron.
+
 ## Daily workflow
 
 1. Add, import, or source new leads.
@@ -305,6 +362,7 @@ Scores should be 1-5. Missing score fields default conservatively.
 - `/sourcing` - Public URL scraper that creates draft leads for review
 - `/import-export` - CSV import and export
 - `/scoring` - Scoring model and priority category reference
+- `/verification` - Manual review queue for unverified and failed listing checks
 - `/outreach` - Outreach generator
 - `/forecast` - Revenue forecast
 - `/followups` - Follow-up tracker

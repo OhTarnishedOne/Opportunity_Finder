@@ -8,7 +8,10 @@ import { formatDate } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const leads = await prisma.lead.findMany({ orderBy: [{ fitScore: "desc" }, { updatedAt: "desc" }] });
+  const leads = await prisma.lead.findMany({
+    where: { verificationStatus: { not: "STALE" } },
+    orderBy: [{ fitScore: "desc" }, { updatedAt: "desc" }],
+  });
   const topLeads = leads.slice(0, 10);
   const recent = [...leads].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()).slice(0, 5);
 

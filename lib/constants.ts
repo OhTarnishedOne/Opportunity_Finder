@@ -29,6 +29,7 @@ export const STAGES = [
   "Proposal Sent",
   "Won",
   "Lost",
+  "Park",
   "Nurture",
 ] as const;
 
@@ -83,6 +84,12 @@ export const SOURCING_MODES = [
   "Universities / Institutions",
   "Credit Unions / Wealth",
 ] as const;
+
+export const ATS_PROVIDERS = ["GREENHOUSE", "LEVER", "ASHBY", "WORKDAY", "OTHER", "UNKNOWN"] as const;
+
+export const VERIFICATION_STATUSES = ["UNVERIFIED", "ACTIVE", "STALE", "ERROR"] as const;
+
+export const TERMINAL_STAGES = ["Won", "Lost", "Park"] as const;
 
 export const SCORE_FIELDS = [
   { key: "abilityToPay", label: "Ability to pay" },

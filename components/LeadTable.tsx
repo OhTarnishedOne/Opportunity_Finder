@@ -6,6 +6,7 @@ import { CategoryBadge } from "@/components/CategoryBadge";
 import { EmptyState } from "@/components/EmptyState";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { StageBadge } from "@/components/StageBadge";
+import { VerificationStatusBadge } from "@/components/VerificationStatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ export function LeadTable({ leads, compact = false }: { leads: LeadRecord[]; com
   const [stage, setStage] = useState("All");
   const [priority, setPriority] = useState("All");
   const [sort, setSort] = useState("score");
+  const [showStale, setShowStale] = useState(false);
 
   const filtered = useMemo(() => {
     const normalizedQuery = query.toLowerCase();
@@ -34,7 +36,8 @@ export function LeadTable({ leads, compact = false }: { leads: LeadRecord[]; com
           searchable.includes(normalizedQuery) &&
           (category === "All" || lead.category === category) &&
           (stage === "All" || lead.stage === stage) &&
-          (priority === "All" || lead.priorityLevel === priority)
+          (priority === "All" || lead.priorityLevel === priority) &&
+          (showStale || lead.verificationStatus !== "STALE")
         );
       })
       .sort((a, b) => {
@@ -44,7 +47,7 @@ export function LeadTable({ leads, compact = false }: { leads: LeadRecord[]; com
         }
         return b.fitScore - a.fitScore;
       });
-  }, [category, leads, priority, query, sort, stage]);
+  }, [category, leads, priority, query, showStale, sort, stage]);
 
   if (!leads.length) {
     return (
@@ -72,7 +75,7 @@ export function LeadTable({ leads, compact = false }: { leads: LeadRecord[]; com
           </div>
         </div>
         {!compact ? (
-          <div className="grid gap-3 md:grid-cols-5">
+          <div className="grid gap-3 md:grid-cols-6">
             <Input placeholder="Search leads..." value={query} onChange={(event) => setQuery(event.target.value)} />
             <Select value={category} onChange={(event) => setCategory(event.target.value)}>
               <option>All</option>
@@ -97,6 +100,10 @@ export function LeadTable({ leads, compact = false }: { leads: LeadRecord[]; com
               <option value="company">Sort by company</option>
               <option value="followUp">Sort by follow-up</option>
             </Select>
+            <label className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-600">
+              <input checked={showStale} onChange={(event) => setShowStale(event.target.checked)} type="checkbox" />
+              Show stale
+            </label>
           </div>
         ) : null}
       </CardHeader>
@@ -109,6 +116,7 @@ export function LeadTable({ leads, compact = false }: { leads: LeadRecord[]; com
               <TableHead>Score</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Stage</TableHead>
+              <TableHead>Freshness</TableHead>
               <TableHead>Next action</TableHead>
               <TableHead>Follow-up</TableHead>
             </TableRow>
@@ -133,6 +141,13 @@ export function LeadTable({ leads, compact = false }: { leads: LeadRecord[]; com
                 </TableCell>
                 <TableCell>
                   <StageBadge stage={lead.stage} />
+                </TableCell>
+                <TableCell>
+                  <VerificationStatusBadge
+                    lastCheckedAt={lead.lastCheckedAt}
+                    staleReason={lead.staleReason}
+                    status={lead.verificationStatus}
+                  />
                 </TableCell>
                 <TableCell className="max-w-xs text-slate-600">{lead.nextAction || "Define next action"}</TableCell>
                 <TableCell className="text-slate-600">{formatDate(lead.followUpDate)}</TableCell>

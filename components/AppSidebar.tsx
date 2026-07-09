@@ -13,6 +13,7 @@ import {
   PlusCircle,
   Search,
   Settings,
+  ShieldCheck,
   SlidersHorizontal,
   Table2,
 } from "lucide-react";
@@ -27,6 +28,7 @@ const items = [
   { href: "/sourcing", label: "Sourcing", icon: Search },
   { href: "/import-export", label: "Import / Export", icon: Import },
   { href: "/scoring", label: "Scoring", icon: SlidersHorizontal },
+  { href: "/verification", label: "Verification", icon: ShieldCheck },
   { href: "/outreach", label: "Outreach", icon: Mail },
   { href: "/forecast", label: "Forecast", icon: DollarSign },
   { href: "/followups", label: "Follow-ups", icon: CalendarClock },

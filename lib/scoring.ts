@@ -130,3 +130,14 @@ export function enrichLeadScores<T extends ScorableLead & { category: string; mo
       lead.monthlyRevenuePotential || recommendRevenuePotential(lead.category, fitScore),
   };
 }
+
+export function applyAvailabilityCap<T extends { fitScore: number; priorityLevel: string }>(scoring: T, atsProvider?: string) {
+  if (atsProvider && atsProvider !== "UNKNOWN" && atsProvider !== "OTHER") return scoring;
+
+  const fitScore = Math.min(scoring.fitScore, 69);
+  return {
+    ...scoring,
+    fitScore,
+    priorityLevel: categorizePriority(fitScore),
+  };
+}

@@ -4,7 +4,10 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function ForecastPage() {
-  const leads = await prisma.lead.findMany({ orderBy: [{ fitScore: "desc" }] });
+  const leads = await prisma.lead.findMany({
+    where: { verificationStatus: { not: "STALE" } },
+    orderBy: [{ fitScore: "desc" }],
+  });
 
   return (
     <div className="space-y-6">

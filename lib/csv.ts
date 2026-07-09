@@ -3,6 +3,7 @@ export const CSV_HEADERS = [
   "company_name",
   "category",
   "website",
+  "canonical_url",
   "location",
   "contact_name",
   "contact_title",
@@ -37,6 +38,15 @@ export const CSV_HEADERS = [
   "source_type",
   "source_last_scraped_at",
   "source_confidence",
+  "ats_provider",
+  "ats_external_id",
+  "ats_board_token",
+  "verification_status",
+  "last_verified_at",
+  "last_checked_at",
+  "stale_detected_at",
+  "stale_reason",
+  "check_fail_count",
   "priority_level",
   "created_at",
   "updated_at",
@@ -78,6 +88,16 @@ const FIELD_MAP: Record<string, string> = {
   source_type: "sourceType",
   source_last_scraped_at: "sourceLastScrapedAt",
   source_confidence: "sourceConfidence",
+  canonical_url: "canonicalUrl",
+  ats_provider: "atsProvider",
+  ats_external_id: "atsExternalId",
+  ats_board_token: "atsBoardToken",
+  verification_status: "verificationStatus",
+  last_verified_at: "lastVerifiedAt",
+  last_checked_at: "lastCheckedAt",
+  stale_detected_at: "staleDetectedAt",
+  stale_reason: "staleReason",
+  check_fail_count: "checkFailCount",
   priority_level: "priorityLevel",
   created_at: "createdAt",
   updated_at: "updatedAt",
@@ -89,6 +109,7 @@ export type CsvImportLead = {
   companyName: string;
   category: string;
   website?: string;
+  canonicalUrl?: string;
   location?: string;
   contactName?: string;
   contactTitle?: string;
@@ -121,6 +142,15 @@ export type CsvImportLead = {
   sourceType?: string;
   sourceLastScrapedAt?: Date;
   sourceConfidence: number;
+  atsProvider?: string;
+  atsExternalId?: string;
+  atsBoardToken?: string;
+  verificationStatus?: string;
+  lastVerifiedAt?: Date;
+  lastCheckedAt?: Date;
+  staleDetectedAt?: Date;
+  staleReason?: string;
+  checkFailCount?: number;
 };
 
 function escapeCsv(value: unknown) {
@@ -170,6 +200,7 @@ export function csvRecordToLead(record: Record<string, string>): CsvImportLead {
     companyName: getText(record, "companyName") || "Untitled imported lead",
     category: getText(record, "category") || "Financial Literacy Organization",
     website: getText(record, "website"),
+    canonicalUrl: getText(record, "canonicalUrl"),
     location: getText(record, "location"),
     contactName: getText(record, "contactName"),
     contactTitle: getText(record, "contactTitle"),
@@ -202,6 +233,15 @@ export function csvRecordToLead(record: Record<string, string>): CsvImportLead {
     sourceType: getText(record, "sourceType") || "CSV import",
     sourceLastScrapedAt: getDate(record, "sourceLastScrapedAt"),
     sourceConfidence: getScore(record, "sourceConfidence", 1),
+    atsProvider: getText(record, "atsProvider"),
+    atsExternalId: getText(record, "atsExternalId"),
+    atsBoardToken: getText(record, "atsBoardToken"),
+    verificationStatus: getText(record, "verificationStatus"),
+    lastVerifiedAt: getDate(record, "lastVerifiedAt"),
+    lastCheckedAt: getDate(record, "lastCheckedAt"),
+    staleDetectedAt: getDate(record, "staleDetectedAt"),
+    staleReason: getText(record, "staleReason"),
+    checkFailCount: getInt(record, "checkFailCount", 0),
   };
 
   return lead;
@@ -278,6 +318,11 @@ function getDate(record: Record<string, string>, key: string) {
   if (!value) return undefined;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
+function getInt(record: Record<string, string>, key: string, fallback: number) {
+  const value = Number(getText(record, key));
+  return Number.isFinite(value) ? Math.max(0, Math.round(value)) : fallback;
 }
 
 export function importableCsvHeaders() {
