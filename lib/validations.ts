@@ -74,4 +74,11 @@ export const sourcingSchema = z.object({
     ),
 });
 
+export const discoverySchema = z.object({
+  sourcingMode: z.enum(SOURCING_MODES).default("General"),
+  focus: optionalText,
+  location: optionalText,
+  maxResults: z.coerce.number().int().min(1).max(20).default(10),
+});
+
 export type LeadFormValues = z.infer<typeof leadFormSchema>;
