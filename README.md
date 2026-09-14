@@ -6,7 +6,7 @@ It answers one daily question:
 
 > Who should Rico contact today, why are they a fit, what should he pitch, and what should he say?
 
-The app is built as a modern SaaS-style MVP with Next.js, TypeScript, Tailwind CSS, shadcn-style UI components, Prisma ORM, SQLite, Recharts, and Zod. It does not include authentication, browser automation, paid APIs, or external AI calls. It includes a conservative local scraper for public pages that you explicitly paste into the sourcing page.
+The app is built as a modern SaaS-style MVP with Next.js, TypeScript, Tailwind CSS, shadcn-style UI components, Prisma ORM, SQLite, Recharts, and Zod. It does not include authentication, browser automation, or external LLM calls. It includes a conservative local scraper for public pages and optional autonomous company discovery through Brave Search API.
 
 ## Framework integration note
 
@@ -179,9 +179,19 @@ Before using the prompt, gather:
 - target companies, job descriptions, or warm connections
 - roles, industries, and work setups to avoid
 
-## Public web sourcing automation
+## Autonomous discovery and public web sourcing
 
-Go to `/sourcing` to paste public URLs and create draft leads from web pages.
+Go to `/sourcing` to discover companies autonomously or paste public URLs and create draft leads from web pages.
+
+For autonomous discovery, add a server-side Brave Search API key to `.env.local`:
+
+```env
+BRAVE_SEARCH_API_KEY="your-key"
+```
+
+Choose a target market, optionally enter a location or a specific search focus, and select **Discover new companies**. The app searches via the structured Brave Search API, excludes blocked sources and duplicate domains, passes candidates through the existing robots-aware scraper and scoring pipeline, and saves successful results at the `Found` stage. Search evidence and the query used are saved in each lead's notes.
+
+Discovery never sends outreach. Review every draft before contacting anyone.
 
 Choose a sourcing mode before scraping:
 
@@ -209,7 +219,7 @@ Good sources:
 
 Safety rules:
 
-- Paste specific public URLs only; the app does not run broad crawling.
+- Autonomous discovery uses a search API and fetches only the returned candidate page; it does not broadly crawl sites.
 - Do not paste LinkedIn, logged-in directories, private communities, or social platforms.
 - The scraper checks basic `robots.txt` disallow rules before fetching a submitted URL.
 - Do not guess private emails. If a public email is not visible, use a contact form or warm intro.
