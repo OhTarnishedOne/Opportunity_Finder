@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { csvRecordToLead, parseCsvText } from "@/lib/csv";
+import { discoverCandidates } from "@/lib/discovery";
 import { scrapeLeadFromUrl } from "@/lib/scraper";
 import { applyAvailabilityCap, enrichLeadScores } from "@/lib/scoring";
-import { leadFormSchema, sourcingSchema, stageUpdateSchema } from "@/lib/validations";
+import { discoverySchema, leadFormSchema, sourcingSchema, stageUpdateSchema } from "@/lib/validations";
 import { canonicalize } from "@/lib/verification/canonicalize";
 
 function dateOrNull(value?: string) {
@@ -92,6 +93,105 @@ export type CsvImportActionState = {
     error: string;
   }>;
 };
+
+export type DiscoveryActionState = SourcingActionState & {
+  skipped: Array<{
+    companyName: string;
+    url: string;
+    reason: string;
+  }>;
+};
+
+function domainFor(rawUrl?: string | null) {
+  if (!rawUrl) return null;
+  try {
+    return new URL(rawUrl).hostname.toLowerCase().replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+}
+
+export async function discoverLeadsAction(
+  _previousState: DiscoveryActionState,
+  formData: FormData,
+): Promise<DiscoveryActionState> {
+  const parsed = discoverySchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) {
+    return {
+      message: parsed.error.issues[0]?.message || "Could not start discovery.",
+      created: [],
+      errors: [],
+      skipped: [],
+    };
+  }
+
+  const state: DiscoveryActionState = { created: [], errors: [], skipped: [] };
+
+  try {
+    const candidates = await discoverCandidates(parsed.data);
+    const existingLeads = await prisma.lead.findMany({
+      select: { companyName: true, website: true, sourceUrl: true },
+    });
+    const knownDomains = new Set(
+      existingLeads.flatMap((lead) => [domainFor(lead.website), domainFor(lead.sourceUrl)]).filter(Boolean),
+    );
+
+    for (const candidate of candidates) {
+      const candidateDomain = domainFor(candidate.url);
+      if (candidateDomain && knownDomains.has(candidateDomain)) {
+        state.skipped.push({
+          companyName: candidate.title,
+          url: candidate.url,
+          reason: "A lead from this domain already exists.",
+        });
+        continue;
+      }
+
+      const result = await scrapeLeadFromUrl(candidate.url, { sourcingMode: parsed.data.sourcingMode });
+      if (!result.ok) {
+        state.errors.push({ url: result.url, error: result.error, warnings: result.warnings });
+        continue;
+      }
+
+      const canonical = await canonicalDataFor(result.draft.sourceUrl || result.draft.website);
+      const scoring = applyAvailabilityCap(enrichLeadScores(result.draft), canonical.atsProvider);
+      const lead = await prisma.lead.create({
+        data: {
+          ...result.draft,
+          ...scoring,
+          ...canonical,
+          notes: [
+            `Discovery query: ${candidate.query}`,
+            candidate.description ? `Search evidence: ${candidate.description}` : "",
+            result.draft.notes,
+          ].filter(Boolean).join("\n"),
+          sourceType: `${parsed.data.sourcingMode} autonomous web discovery`,
+          sourceLastScrapedAt: new Date(),
+        },
+      });
+
+      if (candidateDomain) knownDomains.add(candidateDomain);
+      state.created.push({
+        id: lead.id,
+        companyName: lead.companyName,
+        sourceUrl: result.draft.sourceUrl,
+        warnings: result.warnings,
+      });
+    }
+
+    revalidatePath("/");
+    revalidatePath("/leads");
+    revalidatePath("/sourcing");
+
+    state.message = `Discovered ${candidates.length} candidate${candidates.length === 1 ? "" : "s"}; created ${state.created.length}, skipped ${state.skipped.length}, and failed ${state.errors.length}.`;
+    return state;
+  } catch (error) {
+    return {
+      ...state,
+      message: error instanceof Error ? error.message : "Autonomous discovery failed.",
+    };
+  }
+}
 
 export async function scrapeLeadsAction(
   _previousState: SourcingActionState,
