@@ -2,11 +2,17 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { scrapeLeadsAction, type SourcingActionState } from "@/app/actions";
+import {
+  discoverLeadsAction,
+  scrapeLeadsAction,
+  type DiscoveryActionState,
+  type SourcingActionState,
+} from "@/app/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { SOURCING_MODES } from "@/lib/constants";
 
@@ -14,6 +20,92 @@ const initialState: SourcingActionState = {
   created: [],
   errors: [],
 };
+
+const initialDiscoveryState: DiscoveryActionState = {
+  created: [],
+  errors: [],
+  skipped: [],
+};
+
+export function AutonomousDiscovery() {
+  const [state, action, pending] = useActionState(discoverLeadsAction, initialDiscoveryState);
+
+  return (
+    <Card className="border-sky-200 bg-sky-50/40">
+      <CardHeader>
+        <CardTitle>Discover companies autonomously</CardTitle>
+        <CardDescription>
+          Search the public web, remove domains already in your pipeline, analyze each candidate, and save reviewable
+          Found leads. Nothing is contacted automatically.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <form action={action} className="grid gap-4 lg:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="discoverySourcingMode">Target market</Label>
+            <Select defaultValue="Startups" id="discoverySourcingMode" name="sourcingMode">
+              {SOURCING_MODES.map((mode) => <option key={mode}>{mode}</option>)}
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="location">Location (optional)</Label>
+            <Input id="location" name="location" placeholder="New York or United States" />
+          </div>
+          <div className="space-y-2 lg:col-span-2">
+            <Label htmlFor="focus">Search focus (optional)</Label>
+            <Input
+              id="focus"
+              name="focus"
+              placeholder='e.g. Series A fintech companies hiring operations analysts'
+            />
+            <p className="text-xs leading-5 text-slate-500">
+              Leave blank to use the saved searches for the selected target market.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="maxResults">Maximum candidates</Label>
+            <Select defaultValue="10" id="maxResults" name="maxResults">
+              {[5, 10, 15, 20].map((count) => <option key={count} value={count}>{count}</option>)}
+            </Select>
+          </div>
+          <div className="flex items-end">
+            <Button className="w-full" disabled={pending} type="submit">
+              {pending ? "Discovering and analyzing..." : "Discover new companies"}
+            </Button>
+          </div>
+        </form>
+
+        {state.message ? (
+          <div className="space-y-4 border-t border-sky-100 pt-5">
+            <p className="text-sm font-semibold text-slate-950">{state.message}</p>
+            {state.created.map((lead) => (
+              <div className="rounded-xl border border-emerald-100 bg-white p-4" key={lead.id}>
+                <div className="font-semibold text-emerald-950">{lead.companyName}</div>
+                <div className="mt-1 break-all text-xs text-slate-500">{lead.sourceUrl}</div>
+                <Link className="mt-2 inline-flex text-sm font-semibold text-emerald-800" href={`/leads/${lead.id}`}>
+                  Review lead
+                </Link>
+              </div>
+            ))}
+            {state.skipped.map((item) => (
+              <div className="rounded-xl border border-amber-100 bg-amber-50 p-4" key={item.url}>
+                <div className="font-semibold text-amber-950">Skipped {item.companyName}</div>
+                <div className="mt-1 text-sm text-amber-800">{item.reason}</div>
+              </div>
+            ))}
+            {state.errors.map((item) => (
+              <div className="rounded-xl border border-rose-100 bg-rose-50 p-4" key={item.url}>
+                <div className="font-semibold text-rose-950">Could not analyze candidate</div>
+                <div className="mt-1 break-all text-xs text-rose-700">{item.url}</div>
+                <div className="mt-2 text-sm text-rose-800">{item.error}</div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
+}
 
 export function SourcingScraper() {
   const [state, action, pending] = useActionState(scrapeLeadsAction, initialState);
